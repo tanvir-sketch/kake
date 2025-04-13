@@ -1,0 +1,187 @@
+/**
+ * Trading Platform UI Enhancer
+ * Modifies demo account UI to match real account features and styling
+ * @version 1.3.0
+ * @license MIT
+ */
+(function () {
+  'use strict';
+
+  // Configuration constants
+  const CONFIG = {
+    // Text replacement configuration
+    textReplacements: {
+      targetText: 'Demo',
+      replacementText: 'REAL',
+      replacementColor: '#ffde02',
+      selectors: [
+        '[data-test="account-info-trading-mode"]',
+        '[data-test="navigation-panel"] [data-test="account-info-trading-mode"]'
+      ]
+    },
+    
+    // Button replacement configuration
+    buttonReplacements: {
+      demoButtonSelector: '.AccountWalletButtons_Container__81939 [data-test="demo-account-top-up"]',
+      replacementHTML: `
+        <a class="FlatButton_FlatLinkButton__f553f" href="/pa/withdrawal?login=245054605&amp;source_account=245054605" 
+           target="_blank" rel="noopener noreferrer" data-test="real-account-withdraw">
+          <span>Withdraw</span>
+        </a>
+        <a class="FlatButton_FlatLinkButton__f553f" href="/pa/deposit?login=245054605&amp;destination_account=245054605" 
+           target="_blank" rel="noopener noreferrer" data-test="real-account-deposit">
+          <span>Deposit</span>
+        </a>
+      `
+    },
+    
+    // Transaction history configuration
+    transactionHistory: {
+      containerSelector: '.SelectAccount_transactionsHistoryLinkWrapper__1b636',
+      replacementHTML: `
+        <a href="/pa/history?acc=245054605" target="_blank" 
+           class="SelectAccount_transactionsHistoryLink__1b636">Transaction History</a>
+        <span class="TradingLogDownloadLink_link__5679f">Download Trading Log</span>
+      `,
+      demoIndicatorSelector: '[data-test="account-info-trading-mode"]'
+    },
+    
+    // Observer configuration
+    observerConfig: {
+      childList: true,
+      subtree: true,
+      attributes: false,
+      characterData: false
+    }
+  };
+
+  /**
+   * Updates all trading mode text elements
+   */
+  function updateTradingModeText() {
+    try {
+      const elements = document.querySelectorAll(CONFIG.textReplacements.selectors.join(', '));
+      
+      elements.forEach((element) => {
+        if (element.textContent.trim() === CONFIG.textReplacements.targetText) {
+          element.textContent = CONFIG.textReplacements.replacementText;
+          element.style.color = CONFIG.textReplacements.replacementColor;
+          
+          // Dispatch custom event for tracking
+          const event = new CustomEvent('tradingModeUpdated', {
+            detail: { element }
+          });
+          document.dispatchEvent(event);
+        }
+      });
+    } catch (error) {
+      console.error('Error updating trading mode text:', error);
+    }
+  }
+
+  /**
+   * Replaces demo top-up button with real account buttons
+   */
+  function replaceDemoButtons() {
+    try {
+      const demoButton = document.querySelector(CONFIG.buttonReplacements.demoButtonSelector);
+      if (demoButton) {
+        const container = demoButton.closest('.AccountWalletButtons_Container__81939');
+        if (container) {
+          container.innerHTML = CONFIG.buttonReplacements.replacementHTML;
+        }
+      }
+    } catch (error) {
+      console.error('Error replacing demo buttons:', error);
+    }
+  }
+
+  /**
+   * Enhances transaction history section
+   */
+  function enhanceTransactionHistory() {
+    try {
+      const containers = document.querySelectorAll(CONFIG.transactionHistory.containerSelector);
+      
+      containers.forEach(container => {
+        // Check if this is a demo account container
+        const demoIndicator = container.closest('[data-test="account-types-wrap"]')
+          ?.querySelector(CONFIG.transactionHistory.demoIndicatorSelector);
+        
+        // Only modify if this is a demo account or if the link is missing
+        if ((demoIndicator && demoIndicator.textContent.trim() === 'Demo') || 
+            !container.querySelector('a[href*="/pa/history"]')) {
+          container.innerHTML = CONFIG.transactionHistory.replacementHTML;
+        }
+      });
+    } catch (error) {
+      console.error('Error enhancing transaction history:', error);
+    }
+  }
+
+  /**
+   * Handles all UI updates
+   */
+  function updateUI() {
+    updateTradingModeText();
+    replaceDemoButtons();
+    enhanceTransactionHistory();
+  }
+
+  /**
+   * Initializes mutation observer
+   * @returns {MutationObserver} The configured observer instance
+   */
+  function initMutationObserver() {
+    const observer = new MutationObserver((mutations) => {
+      let shouldUpdate = false;
+      
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+          shouldUpdate = true;
+        }
+      });
+
+      if (shouldUpdate) {
+        updateUI();
+      }
+    });
+
+    try {
+      observer.observe(document.body, CONFIG.observerConfig);
+      return observer;
+    } catch (error) {
+      console.error('Error initializing MutationObserver:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Main initialization function
+   */
+  function init() {
+    // Run immediately if DOM is ready
+    const checkDOM = () => {
+      updateUI();
+    };
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      checkDOM();
+    } else {
+      document.addEventListener('DOMContentLoaded', checkDOM);
+    }
+
+    // Initialize mutation observer
+    const observer = initMutationObserver();
+
+    // Cleanup for single-page applications
+    if (observer) {
+      window.addEventListener('beforeunload', () => {
+        observer.disconnect();
+      });
+    }
+  }
+
+  // Start the script
+  init();
+})();
