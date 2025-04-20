@@ -190,102 +190,6 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
-// পপআপ HTML তৈরি করা হচ্ছে
-const popupHTML = `
-  <div class="popup-overlay">
-    <div class="popup">
-      <button class="close-btn" onclick="this.closest('.popup-overlay').remove()">&times;</button>
-      <h2>Add Transaction</h2>
-
-      <label for="transactionType">Transaction Type</label>
-      <select id="transactionType">
-        <option value="Deposit">Deposit</option>
-        <option value="Payout">Payout</option>
-      </select>
-
-      <label for="transactionDate">Transaction Date</label>
-      <input type="date" id="transactionDate" />
-
-      <label for="transactionTime">Transaction Time</label>
-      <input type="time" id="transactionTime" />
-
-      <label for="transactionAmount">Transaction Amount ($)</label>
-      <input type="text" id="transactionAmount" placeholder="Enter Amount" oninput="formatAmount(this)" />
-
-      <label for="paymentMethod">Payment Method</label>
-      <select id="paymentMethod">
-        <option value="">-- Select Payment Method --</option>
-
-        <!-- Wallet -->
-        <optgroup label="Wallet">
-          <option value="Bkash">Bkash</option>
-          <option value="Nagad">Nagad</option>
-          <option value="Bkash (P2C)">Bkash (P2C)</option>
-          <option value="Upay">Upay</option>
-          <option value="Rocket">Rocket</option>
-          <option value="Nagad (P2C)">Nagad (P2C)</option>
-          <option value="UPI">UPI</option>
-          <option value="Binance Pay">Binance Pay</option>
-          <option value="Bitcoin Cash">Bitcoin Cash</option>
-          <option value="Dash">Dash</option>
-          <option value="Dai">Dai</option>
-          <option value="Solana">Solana</option>
-          <option value="Polkadot">Polkadot</option>
-          <option value="Dogecoin">Dogecoin</option>
-          <option value="Ripple">Ripple</option>
-        </optgroup>
-
-        <!-- Cryptocurrency Method -->
-        <optgroup label="Cryptocurrency Method" class="cryptocurrency-methods">
-          <option value="USD Tether (TRC-20)">${window.innerWidth <= 768 ? 'USD Tether\n(TRC-20)' : 'USD Tether (TRC-20)'}</option>
-          <option value="Litecoin (LTC)">${window.innerWidth <= 768 ? 'Litecoin\n(LTC)' : 'Litecoin (LTC)'}</option>
-          <option value="USD Tether (ERC-20)">${window.innerWidth <= 768 ? 'USD Tether\n(ERC-20)' : 'USD Tether (ERC-20)'}</option>
-          <option value="USD Tether (Polygon)">${window.innerWidth <= 768 ? 'USD Tether\n(Polygon)' : 'USD Tether (Polygon)'}</option>
-          <option value="USD Coin (ERC-20)">${window.innerWidth <= 768 ? 'USD Coin\n(ERC-20)' : 'USD Coin (ERC-20)'}</option>
-          <option value="USD Coin (Polygon)">${window.innerWidth <= 768 ? 'USD Coin\n(Polygon)' : 'USD Coin (Polygon)'}</option>
-          <option value="USD Tether (BEP-20)">${window.innerWidth <= 768 ? 'USD Tether\n(BEP-20)' : 'USD Tether (BEP-20)'}</option>
-          <option value="Bitcoin (BTC)">${window.innerWidth <= 768 ? 'Bitcoin\n(BTC)' : 'Bitcoin (BTC)'}</option>
-          <option value="Ethereum (ETH)">${window.innerWidth <= 768 ? 'Ethereum\n(ETH)' : 'Ethereum (ETH)'}</option>
-          <option value="Tron (TRX)">${window.innerWidth <= 768 ? 'Tron\n(TRX)' : 'Tron (TRX)'}</option>
-          <option value="Polygon (MATIC)">${window.innerWidth <= 768 ? 'Polygon\n(MATIC)' : 'Polygon (MATIC)'}</option>
-          <option value="Shiba Inu (ERC-20)">${window.innerWidth <= 768 ? 'Shiba Inu\n(ERC-20)' : 'Shiba Inu (ERC-20)'}</option>
-          <option value="ApeCoin (APE)">${window.innerWidth <= 768 ? 'ApeCoin\n(APE)' : 'ApeCoin (APE)'}</option>
-          <option value="Uniswap (UNI)">${window.innerWidth <= 768 ? 'Uniswap\n(UNI)' : 'Uniswap (UNI)'}</option>
-          <option value="Avalanche (AVAX)">${window.innerWidth <= 768 ? 'Avalanche\n(AVAX)' : 'Avalanche (AVAX)'}</option>
-        </optgroup>
-
-        <!-- Bank Card -->
-        <optgroup label="Bank Card">
-          <option value="MasterCard">MasterCard</option>
-          <option value="Visa / MasterCard">Visa / MasterCard</option>
-        </optgroup>
-      </select>
-
-      <div class="button-group">
-        <button class="add-btn" onclick="addToTransactionList()">Add Transaction</button>
-        <button onclick="submitAllTransactions()">Submit All</button>
-      </div>
-
-      <div class="transaction-list" id="transactionList">
-        <!-- Added transactions will appear here -->
-      </div>
-      
-      <div class="transaction-count" id="transactionCount">
-        Total Transactions: 0
-      </div>
-    </div>
-  </div>
-`;
-
-document.querySelector('.empty')?.remove();
-
-// যদি ট্রানজেকশন কন্টেইনার না থাকে, তাহলে তৈরি করা হবে
-if (!document.querySelector('.transactions')) {
-    const transactionsContainer = document.createElement('div');
-    transactionsContainer.classList.add('transactions');
-    document.body.appendChild(transactionsContainer);
-}
-
 // ট্রানজেকশন আইডি জেনারেট করার ফাংশন (Payout এর জন্য 12 ডিজিট, Deposit এর জন্য 8 ডিজিট)
 function generateTransactionId(transactionType) {
     if (transactionType === 'Payout') {
@@ -322,7 +226,7 @@ function formatAmount(input) {
 // ট্রানজেকশন লিস্টে যোগ করার ফাংশন
 let transactionsList = [];
 
-function addToTransactionList() {
+window.addToTransactionList = function() {
     const transactionType = document.getElementById('transactionType').value;
     const transactionDate = document.getElementById('transactionDate').value;
     const transactionTime = document.getElementById('transactionTime').value;
@@ -371,7 +275,7 @@ function updateTransactionListUI() {
 }
 
 // সব ট্রানজেকশন একসাথে সাবমিট করার ফাংশন
-function submitAllTransactions() {
+window.submitAllTransactions = function() {
     if (transactionsList.length === 0) {
         alert('No transactions to submit');
         return;
@@ -466,6 +370,102 @@ function submitAllTransactions() {
     transactionsList = [];
     updateTransactionListUI();
     document.querySelector('.popup-overlay').remove();
+}
+
+// পপআপ HTML তৈরি করা হচ্ছে
+const popupHTML = `
+  <div class="popup-overlay">
+    <div class="popup">
+      <button class="close-btn" onclick="this.closest('.popup-overlay').remove()">&times;</button>
+      <h2>Add Transaction</h2>
+
+      <label for="transactionType">Transaction Type</label>
+      <select id="transactionType">
+        <option value="Deposit">Deposit</option>
+        <option value="Payout">Payout</option>
+      </select>
+
+      <label for="transactionDate">Transaction Date</label>
+      <input type="date" id="transactionDate" />
+
+      <label for="transactionTime">Transaction Time</label>
+      <input type="time" id="transactionTime" />
+
+      <label for="transactionAmount">Transaction Amount ($)</label>
+      <input type="text" id="transactionAmount" placeholder="Enter Amount" oninput="formatAmount(this)" />
+
+      <label for="paymentMethod">Payment Method</label>
+      <select id="paymentMethod">
+        <option value="">-- Select Payment Method --</option>
+
+        <!-- Wallet -->
+        <optgroup label="Wallet">
+          <option value="Bkash">Bkash</option>
+          <option value="Nagad">Nagad</option>
+          <option value="Bkash (P2C)">Bkash (P2C)</option>
+          <option value="Upay">Upay</option>
+          <option value="Rocket">Rocket</option>
+          <option value="Nagad (P2C)">Nagad (P2C)</option>
+          <option value="UPI">UPI</option>
+          <option value="Binance Pay">Binance Pay</option>
+          <option value="Bitcoin Cash">Bitcoin Cash</option>
+          <option value="Dash">Dash</option>
+          <option value="Dai">Dai</option>
+          <option value="Solana">Solana</option>
+          <option value="Polkadot">Polkadot</option>
+          <option value="Dogecoin">Dogecoin</option>
+          <option value="Ripple">Ripple</option>
+        </optgroup>
+
+        <!-- Cryptocurrency Method -->
+        <optgroup label="Cryptocurrency Method" class="cryptocurrency-methods">
+          <option value="USD Tether (TRC-20)">${window.innerWidth <= 768 ? 'USD Tether\n(TRC-20)' : 'USD Tether (TRC-20)'}</option>
+          <option value="Litecoin (LTC)">${window.innerWidth <= 768 ? 'Litecoin\n(LTC)' : 'Litecoin (LTC)'}</option>
+          <option value="USD Tether (ERC-20)">${window.innerWidth <= 768 ? 'USD Tether\n(ERC-20)' : 'USD Tether (ERC-20)'}</option>
+          <option value="USD Tether (Polygon)">${window.innerWidth <= 768 ? 'USD Tether\n(Polygon)' : 'USD Tether (Polygon)'}</option>
+          <option value="USD Coin (ERC-20)">${window.innerWidth <= 768 ? 'USD Coin\n(ERC-20)' : 'USD Coin (ERC-20)'}</option>
+          <option value="USD Coin (Polygon)">${window.innerWidth <= 768 ? 'USD Coin\n(Polygon)' : 'USD Coin (Polygon)'}</option>
+          <option value="USD Tether (BEP-20)">${window.innerWidth <= 768 ? 'USD Tether\n(BEP-20)' : 'USD Tether (BEP-20)'}</option>
+          <option value="Bitcoin (BTC)">${window.innerWidth <= 768 ? 'Bitcoin\n(BTC)' : 'Bitcoin (BTC)'}</option>
+          <option value="Ethereum (ETH)">${window.innerWidth <= 768 ? 'Ethereum\n(ETH)' : 'Ethereum (ETH)'}</option>
+          <option value="Tron (TRX)">${window.innerWidth <= 768 ? 'Tron\n(TRX)' : 'Tron (TRX)'}</option>
+          <option value="Polygon (MATIC)">${window.innerWidth <= 768 ? 'Polygon\n(MATIC)' : 'Polygon (MATIC)'}</option>
+          <option value="Shiba Inu (ERC-20)">${window.innerWidth <= 768 ? 'Shiba Inu\n(ERC-20)' : 'Shiba Inu (ERC-20)'}</option>
+          <option value="ApeCoin (APE)">${window.innerWidth <= 768 ? 'ApeCoin\n(APE)' : 'ApeCoin (APE)'}</option>
+          <option value="Uniswap (UNI)">${window.innerWidth <= 768 ? 'Uniswap\n(UNI)' : 'Uniswap (UNI)'}</option>
+          <option value="Avalanche (AVAX)">${window.innerWidth <= 768 ? 'Avalanche\n(AVAX)' : 'Avalanche (AVAX)'}</option>
+        </optgroup>
+
+        <!-- Bank Card -->
+        <optgroup label="Bank Card">
+          <option value="MasterCard">MasterCard</option>
+          <option value="Visa / MasterCard">Visa / MasterCard</option>
+        </optgroup>
+      </select>
+
+      <div class="button-group">
+        <button class="add-btn" onclick="addToTransactionList()">Add Transaction</button>
+        <button onclick="submitAllTransactions()">Submit All</button>
+      </div>
+
+      <div class="transaction-list" id="transactionList">
+        <!-- Added transactions will appear here -->
+      </div>
+      
+      <div class="transaction-count" id="transactionCount">
+        Total Transactions: 0
+      </div>
+    </div>
+  </div>
+`;
+
+document.querySelector('.empty')?.remove();
+
+// যদি ট্রানজেকশন কন্টেইনার না থাকে, তাহলে তৈরি করা হবে
+if (!document.querySelector('.transactions')) {
+    const transactionsContainer = document.createElement('div');
+    transactionsContainer.classList.add('transactions');
+    document.body.appendChild(transactionsContainer);
 }
 
 // পপআপ দেখানোর জন্য ফাংশন
