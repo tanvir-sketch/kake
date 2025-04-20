@@ -1,0 +1,491 @@
+// CSS স্টাইলিং যা পপআপটি আরও সুন্দর করে তৈরি করবে
+const style = document.createElement('style');
+style.innerHTML = `
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .popup {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: slideUp 0.4s ease;
+    position: relative;
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  .popup h2 {
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+    color: #2c3e50;
+    font-weight: 600;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  }
+  
+  .popup label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #34495e;
+    text-align: left;
+    font-size: 0.95rem;
+  }
+  
+  .popup input, .popup select {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 2px solid #dfe6e9;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  .popup input:focus, .popup select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    outline: none;
+  }
+  
+  .popup button {
+    padding: 14px 30px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  
+  .popup button:hover {
+    background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+  
+  .popup button:active {
+    transform: translateY(0);
+  }
+  
+  .popup select option {
+    padding: 10px;
+  }
+  
+  optgroup {
+    font-weight: bold;
+    font-style: normal;
+    color: #2c3e50;
+    padding: 5px 0;
+  }
+  
+  optgroup option {
+    font-weight: normal;
+    padding: 8px 15px;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #7f8c8d;
+    transition: color 0.3s;
+  }
+  
+  .close-btn:hover {
+    color: #e74c3c;
+  }
+  
+  .transaction-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin: 20px 0;
+    padding: 10px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 10px;
+    border: 1px solid #dfe6e9;
+  }
+  
+  .transaction-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+  }
+  
+  .transaction-item:last-child {
+    border-bottom: none;
+  }
+  
+  .transaction-count {
+    font-weight: bold;
+    margin-top: 10px;
+    color: #2c3e50;
+  }
+  
+  .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .button-group button {
+    flex: 1;
+  }
+  
+  .add-btn {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important;
+  }
+  
+  .add-btn:hover {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%) !important;
+  }
+  
+  @media (max-width: 768px) {
+    .cryptocurrency-methods option {
+      white-space: pre-wrap;
+    }
+    
+    .button-group {
+      flex-direction: column;
+    }
+  }
+`;
+document.head.appendChild(style);
+
+// পপআপ HTML তৈরি করা হচ্ছে
+const popupHTML = `
+  <div class="popup-overlay">
+    <div class="popup">
+      <button class="close-btn" onclick="this.closest('.popup-overlay').remove()">&times;</button>
+      <h2>Add Transaction</h2>
+
+      <label for="transactionType">Transaction Type</label>
+      <select id="transactionType">
+        <option value="Deposit">Deposit</option>
+        <option value="Payout">Payout</option>
+      </select>
+
+      <label for="transactionDate">Transaction Date</label>
+      <input type="date" id="transactionDate" />
+
+      <label for="transactionTime">Transaction Time</label>
+      <input type="time" id="transactionTime" />
+
+      <label for="transactionAmount">Transaction Amount ($)</label>
+      <input type="text" id="transactionAmount" placeholder="Enter Amount" oninput="formatAmount(this)" />
+
+      <label for="paymentMethod">Payment Method</label>
+      <select id="paymentMethod">
+        <option value="">-- Select Payment Method --</option>
+
+        <!-- Wallet -->
+        <optgroup label="Wallet">
+          <option value="Bkash">Bkash</option>
+          <option value="Nagad">Nagad</option>
+          <option value="Bkash (P2C)">Bkash (P2C)</option>
+          <option value="Upay">Upay</option>
+          <option value="Rocket">Rocket</option>
+          <option value="Nagad (P2C)">Nagad (P2C)</option>
+          <option value="UPI">UPI</option>
+          <option value="Binance Pay">Binance Pay</option>
+          <option value="Bitcoin Cash">Bitcoin Cash</option>
+          <option value="Dash">Dash</option>
+          <option value="Dai">Dai</option>
+          <option value="Solana">Solana</option>
+          <option value="Polkadot">Polkadot</option>
+          <option value="Dogecoin">Dogecoin</option>
+          <option value="Ripple">Ripple</option>
+        </optgroup>
+
+        <!-- Cryptocurrency Method -->
+        <optgroup label="Cryptocurrency Method" class="cryptocurrency-methods">
+          <option value="USD Tether (TRC-20)">${window.innerWidth <= 768 ? 'USD Tether\n(TRC-20)' : 'USD Tether (TRC-20)'}</option>
+          <option value="Litecoin (LTC)">${window.innerWidth <= 768 ? 'Litecoin\n(LTC)' : 'Litecoin (LTC)'}</option>
+          <option value="USD Tether (ERC-20)">${window.innerWidth <= 768 ? 'USD Tether\n(ERC-20)' : 'USD Tether (ERC-20)'}</option>
+          <option value="USD Tether (Polygon)">${window.innerWidth <= 768 ? 'USD Tether\n(Polygon)' : 'USD Tether (Polygon)'}</option>
+          <option value="USD Coin (ERC-20)">${window.innerWidth <= 768 ? 'USD Coin\n(ERC-20)' : 'USD Coin (ERC-20)'}</option>
+          <option value="USD Coin (Polygon)">${window.innerWidth <= 768 ? 'USD Coin\n(Polygon)' : 'USD Coin (Polygon)'}</option>
+          <option value="USD Tether (BEP-20)">${window.innerWidth <= 768 ? 'USD Tether\n(BEP-20)' : 'USD Tether (BEP-20)'}</option>
+          <option value="Bitcoin (BTC)">${window.innerWidth <= 768 ? 'Bitcoin\n(BTC)' : 'Bitcoin (BTC)'}</option>
+          <option value="Ethereum (ETH)">${window.innerWidth <= 768 ? 'Ethereum\n(ETH)' : 'Ethereum (ETH)'}</option>
+          <option value="Tron (TRX)">${window.innerWidth <= 768 ? 'Tron\n(TRX)' : 'Tron (TRX)'}</option>
+          <option value="Polygon (MATIC)">${window.innerWidth <= 768 ? 'Polygon\n(MATIC)' : 'Polygon (MATIC)'}</option>
+          <option value="Shiba Inu (ERC-20)">${window.innerWidth <= 768 ? 'Shiba Inu\n(ERC-20)' : 'Shiba Inu (ERC-20)'}</option>
+          <option value="ApeCoin (APE)">${window.innerWidth <= 768 ? 'ApeCoin\n(APE)' : 'ApeCoin (APE)'}</option>
+          <option value="Uniswap (UNI)">${window.innerWidth <= 768 ? 'Uniswap\n(UNI)' : 'Uniswap (UNI)'}</option>
+          <option value="Avalanche (AVAX)">${window.innerWidth <= 768 ? 'Avalanche\n(AVAX)' : 'Avalanche (AVAX)'}</option>
+        </optgroup>
+
+        <!-- Bank Card -->
+        <optgroup label="Bank Card">
+          <option value="MasterCard">MasterCard</option>
+          <option value="Visa / MasterCard">Visa / MasterCard</option>
+        </optgroup>
+      </select>
+
+      <div class="button-group">
+        <button class="add-btn" onclick="addToTransactionList()">Add Transaction</button>
+        <button onclick="submitAllTransactions()">Submit All</button>
+      </div>
+
+      <div class="transaction-list" id="transactionList">
+        <!-- Added transactions will appear here -->
+      </div>
+      
+      <div class="transaction-count" id="transactionCount">
+        Total Transactions: 0
+      </div>
+    </div>
+  </div>
+`;
+
+document.querySelector('.empty')?.remove();
+
+// যদি ট্রানজেকশন কন্টেইনার না থাকে, তাহলে তৈরি করা হবে
+if (!document.querySelector('.transactions')) {
+    const transactionsContainer = document.createElement('div');
+    transactionsContainer.classList.add('transactions');
+    document.body.appendChild(transactionsContainer);
+}
+
+// ট্রানজেকশন আইডি জেনারেট করার ফাংশন (Payout এর জন্য 12 ডিজিট, Deposit এর জন্য 8 ডিজিট)
+function generateTransactionId(transactionType) {
+    if (transactionType === 'Payout') {
+        return Math.floor(Math.random() * 900000000000) + 100000000000; // 12 ডিজিট
+    } else {
+        return Math.floor(Math.random() * 90000000) + 10000000; // 8 ডিজিট
+    }
+}
+
+// ডেট ও টাইম ফরম্যাট পরিবর্তনের ফাংশন (র‍্যান্ডম সেকেন্ড সহ)
+function formatDateTime(date, time) {
+    const dateParts = date.split('-');
+    const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+    
+    // র‍্যান্ডম সেকেন্ড জেনারেট করুন (0 থেকে 59 এর মধ্যে)
+    const randomSeconds = Math.floor(Math.random() * 60).toString().padStart(2, '0');
+    
+    const formattedTime = `${time}:${randomSeconds}`;
+    
+    return `${formattedDate}, ${formattedTime}`;
+}
+
+// অ্যামাউন্ট ফরম্যাট করার ফাংশন
+function formatAmount(input) {
+    let value = input.value.replace(/[^0-9.]/g, '');
+    if (value) {
+        value = parseFloat(value).toFixed(2).toString();
+        let parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        input.value = parts.join('.');
+    }
+}
+
+// ট্রানজেকশন লিস্টে যোগ করার ফাংশন
+let transactionsList = [];
+
+function addToTransactionList() {
+    const transactionType = document.getElementById('transactionType').value;
+    const transactionDate = document.getElementById('transactionDate').value;
+    const transactionTime = document.getElementById('transactionTime').value;
+    const transactionAmount = document.getElementById('transactionAmount').value || '0.00';
+    const paymentMethod = document.getElementById('paymentMethod').value;
+
+    if (!transactionDate || !transactionAmount || !paymentMethod) {
+        alert('Please fill all required fields');
+        return;
+    }
+
+    const transaction = {
+        type: transactionType,
+        date: transactionDate,
+        time: transactionTime,
+        amount: transactionAmount,
+        method: paymentMethod
+    };
+
+    transactionsList.push(transaction);
+    updateTransactionListUI();
+    
+    // Reset form fields
+    document.getElementById('transactionAmount').value = '';
+    document.getElementById('paymentMethod').value = '';
+}
+
+// ট্রানজেকশন লিস্ট UI আপডেট করার ফাংশন
+function updateTransactionListUI() {
+    const transactionListElement = document.getElementById('transactionList');
+    const transactionCountElement = document.getElementById('transactionCount');
+    
+    transactionListElement.innerHTML = '';
+    
+    transactionsList.forEach((transaction, index) => {
+        const transactionItem = document.createElement('div');
+        transactionItem.className = 'transaction-item';
+        transactionItem.innerHTML = `
+            <span>${index + 1}. ${transaction.type} ($${transaction.amount})</span>
+            <span>${transaction.method}</span>
+        `;
+        transactionListElement.appendChild(transactionItem);
+    });
+    
+    transactionCountElement.textContent = `Total Transactions: ${transactionsList.length}`;
+}
+
+// সব ট্রানজেকশন একসাথে সাবমিট করার ফাংশন
+function submitAllTransactions() {
+    if (transactionsList.length === 0) {
+        alert('No transactions to submit');
+        return;
+    }
+
+    const transactionsContainer = document.querySelector('.transactions');
+    const existingTransactions = transactionsContainer.querySelectorAll('.transactions-item');
+    const transactionsListContainer = transactionsContainer.querySelector('.transactions-list') || document.createElement('div');
+    
+    // Create a temporary container to hold all transactions
+    const tempContainer = document.createElement('div');
+    
+    // Add new transactions first
+    transactionsList.forEach(transaction => {
+        const transactionId = generateTransactionId(transaction.type);
+        const formattedDateTime = formatDateTime(transaction.date, transaction.time);
+
+        let amountHTML;
+        if (transaction.type === 'Deposit') {
+            amountHTML = `<b class="transactions-item__amount green">+$${transaction.amount}</b>`;
+        } else {
+            amountHTML = `<b class="transactions-item__amount" style="color: #ff6251;">-$${transaction.amount}</b>`;
+        }
+
+        const transactionHTML = `
+            <div class="transactions-item">
+                <div class="transactions-item__id">${transactionId}</div>
+                <div class="transactions-item__date">${formattedDateTime}</div>
+                <div class="transactions-item__status">
+                    <div class="transactions-item__status-block">
+                        <div class="transactions-item__status-icon success">
+                            <svg class="icon-check-tiny"><use xlink:href="/profile/images/spritemap.svg#icon-check-tiny"></use></svg>
+                        </div>
+                        <span class="transactions-item__status-text check-tiny">Successed</span>
+                    </div>
+                </div>
+                <div class="transactions-item__type">${transaction.type}</div>
+                <div class="transactions-item__method">${transaction.method}</div>
+                ${amountHTML}
+            </div>
+        `;
+
+        tempContainer.innerHTML += transactionHTML;
+    });
+    
+    // Then add existing transactions
+    existingTransactions.forEach(transaction => {
+        tempContainer.appendChild(transaction.cloneNode(true));
+    });
+    
+    // Replace the old content with the new ordered content
+    if (transactionsContainer.querySelector('.transactions-list')) {
+        transactionsContainer.querySelector('.transactions-list').innerHTML = tempContainer.innerHTML;
+    } else {
+        transactionsListContainer.className = 'transactions-list';
+        transactionsListContainer.innerHTML = tempContainer.innerHTML;
+        
+        // Find the transactions-list__header or create it if not exists
+        let header = transactionsContainer.querySelector('.transactions-list__header');
+        if (!header) {
+            header = document.createElement('div');
+            header.className = 'transactions-list__header';
+            header.innerHTML = `
+                <div>Order</div>
+                <div>Date and time</div>
+                <div>Status</div>
+                <div>Transaction type</div>
+                <div>Payment system</div>
+                <div>Amount</div>
+            `;
+            
+            // Insert the header before the transactions list
+            const tabsMenu = transactionsContainer.querySelector('.tabs-menu');
+            const filters = transactionsContainer.querySelector('.transactions-filters');
+            
+            if (filters) {
+                filters.after(header);
+                header.after(transactionsListContainer);
+            } else if (tabsMenu) {
+                tabsMenu.after(header);
+                header.after(transactionsListContainer);
+            } else {
+                transactionsContainer.prepend(header);
+                header.after(transactionsListContainer);
+            }
+        } else {
+            header.after(transactionsListContainer);
+        }
+    }
+
+    // রিসেট করা
+    transactionsList = [];
+    updateTransactionListUI();
+    document.querySelector('.popup-overlay').remove();
+}
+
+// পপআপ দেখানোর জন্য ফাংশন
+function showPopup() {
+    const popupDiv = document.createElement('div');
+    popupDiv.innerHTML = popupHTML;
+    document.body.appendChild(popupDiv);
+    
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('transactionDate').value = today;
+    
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('transactionTime').value = `${hours}:${minutes}`;
+    
+    // নতুন ট্রানজেকশন লিস্ট শুরু করা
+    transactionsList = [];
+    updateTransactionListUI();
+}
+
+// পপআপ শো করা হচ্ছে
+showPopup();
